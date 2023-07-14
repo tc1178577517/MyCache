@@ -1,4 +1,4 @@
-package com.tc.core.api;
+package com.tc.api;
 
 import com.tc.api.ICache;
 
