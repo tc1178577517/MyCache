@@ -1,4 +1,4 @@
-package com.tc.core.exception;
+package com.tc.exception;
 
 /**
  * 异常处理类
