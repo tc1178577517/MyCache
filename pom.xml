@@ -11,7 +11,16 @@
     <modules>
         <module>cacheApi</module>
         <module>Cache</module>
+        <module>CacheTest</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>heaven</artifactId>
+            <version>0.2.5</version>
+        </dependency>
+    </dependencies>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
