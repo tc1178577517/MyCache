@@ -1,5 +1,11 @@
 package com.tc.api;
 
+/**
+ * 淘汰策略
+ *
+ * @param <K>
+ * @param <V>
+ */
 public interface ICacheEvictContext<K, V>{
     /**
      * 新增key
