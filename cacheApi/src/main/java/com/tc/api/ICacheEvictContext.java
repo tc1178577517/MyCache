@@ -1,7 +1,16 @@
 package com.tc.api;
 
 public interface ICacheEvictContext<K, V>{
+    /**
+     * 新增key
+     * @return
+     */
     K key();
+
+    /**
+     * cache实现
+     * @return
+     */
     ICache<K, V> cache();
 
     /**
