@@ -13,7 +13,7 @@ public interface ICache<K, V> extends Map<K, V> {
     ICache<K, V> expire(final K key, final long timeInMills);
 
     /**
-     * 指定时间过去
+     * 指定时间过期
      * @param key
      * @param timeInMills 时间戳
      * @return this
