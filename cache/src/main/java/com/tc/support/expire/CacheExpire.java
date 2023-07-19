@@ -41,6 +41,7 @@ public class CacheExpire<K, V> implements ICacheExpire<K, V>{
 
     public CacheExpire(ICache<K, V> cache) {
         this.cache = cache;
+        this.init();
     }
 
     private void init(){
@@ -88,7 +89,11 @@ public class CacheExpire<K, V> implements ICacheExpire<K, V>{
         Long expireAt = expireMap.get(key);
         if(expireAt == null) return;
         long currentTime = System.currentTimeMillis();
-        if(currentTime >= expireAt) expireMap.remove(key);
+        if(currentTime >= expireAt){
+            expireMap.remove(key);
+            //如果线程在此终止，后续可通过惰性删除删除这条缓存的数据
+            cache.remove(key);
+        }
     }
 
 
