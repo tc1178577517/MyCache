@@ -1,6 +1,5 @@
 package com.tc;
 
-import com.github.houbb.heaven.support.cache.ICache;
 import com.tc.bs.CacheBootstrap;
 import com.tc.core.Cache;
 import org.junit.Assert;
