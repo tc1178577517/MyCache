@@ -24,6 +24,16 @@ public class CacheAdaptor<K, V> implements ICache<K, V> {
     }
 
     @Override
+    public ICacheExpire<K, V> expire() {
+        return null;
+    }
+
+    @Override
+    public ICache<K, V> load(ICacheLoad<K, V> cacheLoad) {
+        return null;
+    }
+
+    @Override
     public int size() {
         return 0;
     }
