@@ -2,6 +2,8 @@ package com.tc;
 
 import com.tc.bs.CacheBootstrap;
 import com.tc.core.Cache;
+import com.tc.load.MyCacheLoad;
+import com.tc.support.persist.CachePersists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,5 +42,26 @@ public class CacheBsTest {
         Assert.assertEquals(1, cache.size());
 
         System.out.println(cache.keySet());
+    }
+
+    @Test
+    public void LoadTest() throws InterruptedException {
+        Cache<String, String> cache = (Cache<String, String>) CacheBootstrap.<String,String>newInstance()
+                .size(4)
+                .load(new MyCacheLoad())
+                .build();
+
+        System.out.println(cache.keySet());
+    }
+
+    @Test
+    public void PersistsTest() throws InterruptedException {
+        Cache<String, String> cache = (Cache<String, String>) CacheBootstrap.<String,String>newInstance()
+                .load(new MyCacheLoad())
+                .persist(CachePersists.<String, String> dbJson("C:\\Users\\volcano\\Desktop\\1.rdb"))
+                .build();
+
+        Assert.assertEquals(2, cache.size());
+        TimeUnit.SECONDS.sleep(5);
     }
 }
