@@ -19,4 +19,18 @@ public interface ICache<K, V> extends Map<K, V> {
      * @return this
      */
     ICache<K, V> expireAt(final K key, final long timeInMills);
+
+    /**
+     * 获取缓存的过期处理类
+     * @return ICacheExpire
+     */
+    ICacheExpire<K,V> expire();
+
+
+    /**
+     * 从磁盘中加载缓存信息
+     * @param cacheLoad
+     * @return
+     */
+    ICache<K, V> load(ICacheLoad<K, V> cacheLoad);
 }
