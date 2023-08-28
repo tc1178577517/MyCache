@@ -1,11 +1,11 @@
 package com.tc.core;
 
-import com.tc.api.ICache;
-import com.tc.api.ICacheEvict;
-import com.tc.api.ICacheExpire;
+import com.tc.api.*;
 import com.tc.exception.CacheRuntimeException;
 import com.tc.support.evict.CacheEvictContext;
 import com.tc.support.expire.CacheExpire;
+import com.tc.support.load.CacheLoads;
+import com.tc.support.persist.InnerCachePersist;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Cache<K, V> implements ICache<K, V> {
+
     /**
      * map信息
      */
@@ -22,6 +23,7 @@ public class Cache<K, V> implements ICache<K, V> {
      * 大小限制
      */
     private final int sizeLimit;
+
     /**
      * 淘汰策略
      */
@@ -30,8 +32,19 @@ public class Cache<K, V> implements ICache<K, V> {
      * 过期策略
      * 暂时不做暴露
      */
-    private final ICacheExpire<K, V> cacheExpire;
+    private ICacheExpire<K, V> cacheExpire;
 
+    /**
+     * 从磁盘中加载缓存信息
+     */
+    private ICacheLoad<K, V> load;
+
+    private ICachePersist<K, V> cachePersist;
+
+    /**
+     * 用上下文构造cache
+     * @param context
+     */
     public Cache(CacheContext<K, V> context) {
         this.map = context.map();
         this.sizeLimit = context.size();
@@ -39,11 +52,57 @@ public class Cache<K, V> implements ICache<K, V> {
         this.cacheExpire = new CacheExpire<>(this);
     }
 
+    /**
+     * 从磁盘加载缓存
+     * @return
+     */
+    public ICache<K, V> load(){
+        return this;
+    }
+
+    public ICache<K, V> load(ICacheLoad cacheLoad){
+        this.load = cacheLoad;
+        return this;
+    }
+
+    public ICache<K, V> persist(ICachePersist<K, V> cachePersist){
+        this.cachePersist = cachePersist;
+        return this;
+    }
+
+    public void setCachePersist(ICachePersist<K, V> cachePersist){
+        this.cachePersist = cachePersist;
+    }
+
+    /**
+     * 初始化方法
+     *
+     */
+    public void init(){
+        this.load.load(this);
+        this.cacheExpire = new CacheExpire<>(this);
+
+        // 初始化持久化
+        if(this.cachePersist != null) {
+            new InnerCachePersist<>(this, cachePersist);
+        }
+    }
+
+    /**
+     * 为key设置过期时间
+     * @param key
+     * @param timeInMills 时间戳
+     * @return
+     */
     @Override
     public ICache<K, V> expire(K key, long timeInMills) {
 
         long expireTime = System.currentTimeMillis() + timeInMills;
         return this.expireAt(key, expireTime);
+    }
+
+    public ICacheExpire<K, V> expire() {
+        return this.cacheExpire;
     }
 
     @Override
@@ -85,7 +144,7 @@ public class Cache<K, V> implements ICache<K, V> {
 
     @Override
     public V get(Object key) {
-        //刷新所以过期信息
+        //刷新所有过期信息
         K genericKey = (K) key;
         this.cacheExpire.refreshExpire(Collections.singletonList(genericKey));
 
@@ -94,7 +153,7 @@ public class Cache<K, V> implements ICache<K, V> {
 
     @Override
     public V put(K key, V value) {
-        //尝试淘汰
+        //检查是否需要淘汰数据
         CacheEvictContext<K, V> context = new CacheEvictContext<>();
         context.key(key).size(sizeLimit).cache(this);
         cacheEvict.evict(context);
