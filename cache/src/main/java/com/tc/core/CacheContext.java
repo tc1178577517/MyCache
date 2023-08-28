@@ -1,8 +1,6 @@
 package com.tc.core;
 
-import com.tc.api.ICacheContext;
-import com.tc.api.ICacheEvict;
-import com.tc.api.ICacheEvictContext;
+import com.tc.api.*;
 
 import java.util.Map;
 
