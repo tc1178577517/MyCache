@@ -64,4 +64,16 @@ public class CacheBsTest {
         Assert.assertEquals(2, cache.size());
         TimeUnit.SECONDS.sleep(5);
     }
+
+    @Test
+    public void LogTest(){
+        Cache<String, String> cache = (Cache<String, String>) CacheBootstrap.<String,String>newInstance()
+                .size(3)
+                .load(new MyCacheLoad())
+                .build();
+
+        cache.put("removeLog1","test");
+        cache.put("removeLog2","test");
+        cache.clear();
+    }
 }

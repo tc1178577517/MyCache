@@ -6,12 +6,14 @@ import com.tc.support.evict.CacheEvictContext;
 import com.tc.support.expire.CacheExpire;
 import com.tc.support.load.CacheLoads;
 import com.tc.support.persist.InnerCachePersist;
+import lombok.extern.log4j.Log4j;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+@Log4j
 public class Cache<K, V> implements ICache<K, V> {
 
     /**
@@ -162,6 +164,8 @@ public class Cache<K, V> implements ICache<K, V> {
         if(isSizeLimit()){
             throw new CacheRuntimeException("当前队列已满，数据添加失败！");
         }
+        //输出日志
+        log.debug("添加缓存—— key 为"+key.toString()+" value 为"+value.toString());
         //执行添加
         return map.put(key, value);
     }
@@ -173,6 +177,8 @@ public class Cache<K, V> implements ICache<K, V> {
 
     @Override
     public V remove(Object key) {
+        //输出日志
+        log.debug("key为"+key.toString()+" value 为"+this.get(key)+" 的缓存被删除");
         return map.remove(key);
     }
 
@@ -183,6 +189,8 @@ public class Cache<K, V> implements ICache<K, V> {
 
     @Override
     public void clear() {
+        //输出日志
+        log.debug("缓存被清空");
         map.clear();
     }
 

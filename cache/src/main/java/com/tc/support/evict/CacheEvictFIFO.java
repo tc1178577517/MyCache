@@ -3,6 +3,7 @@ package com.tc.support.evict;
 import com.tc.api.ICache;
 import com.tc.api.ICacheEvict;
 import com.tc.api.ICacheEvictContext;
+import lombok.extern.log4j.Log4j;
 
 import java.util.LinkedList;
 import java.util.Queue;
