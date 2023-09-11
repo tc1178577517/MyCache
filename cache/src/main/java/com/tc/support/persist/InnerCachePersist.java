@@ -42,7 +42,7 @@ public class InnerCachePersist <K, V>{
             @Override
             public void run() {
                 try{
-                    System.out.println("开始以Json格式持久化缓存");
+                    System.out.println("线程开始持久化缓存");
                     persist.persist(cache);
                     System.out.println("持久化缓存结束");
                 }catch (Exception e){

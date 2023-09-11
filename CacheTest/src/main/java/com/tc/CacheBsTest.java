@@ -3,6 +3,7 @@ package com.tc;
 import com.tc.bs.CacheBootstrap;
 import com.tc.core.Cache;
 import com.tc.load.MyCacheLoad;
+import com.tc.support.load.CacheLoadDbJson;
 import com.tc.support.persist.CachePersists;
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,4 +65,16 @@ public class CacheBsTest {
         Assert.assertEquals(2, cache.size());
         TimeUnit.SECONDS.sleep(5);
     }
+
+    @Test
+    public void LoadFromJSONTest() throws InterruptedException {
+        Cache<String, String> cache = (Cache<String, String>) CacheBootstrap.<String,String>newInstance()
+                .load(new CacheLoadDbJson<>("C:\\Users\\volcano\\Desktop\\1.rdb"))
+                .build();
+        cache.put("LoadFromJSONTest1", "balabala");
+        cache.put("LoadFromJSONTest2", "balabala");
+
+        System.out.println(cache.keySet());
+    }
+
 }
