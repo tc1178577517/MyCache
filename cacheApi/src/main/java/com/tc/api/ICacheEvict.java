@@ -7,8 +7,8 @@ package com.tc.api;
  */
 public interface ICacheEvict<K, V> {
     /**
-     *
      * @param context
+     * @return
      */
-    void evict(final ICacheEvictContext<K, V> context);
+    boolean evict(final ICacheEvictContext<K, V> context);
 }

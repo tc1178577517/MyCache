@@ -1,17 +1,16 @@
 package com.tc.core;
 
+import com.tc.annotation.CacheInterceptor;
 import com.tc.api.*;
+import com.tc.constant.enums.CacheRemoveType;
 import com.tc.exception.CacheRuntimeException;
 import com.tc.support.evict.CacheEvictContext;
 import com.tc.support.expire.CacheExpire;
-import com.tc.support.load.CacheLoads;
+import com.tc.support.listener.CacheRemoveListenerContext;
 import com.tc.support.persist.InnerCachePersist;
 import lombok.extern.log4j.Log4j;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Log4j
 public class Cache<K, V> implements ICache<K, V> {
@@ -20,6 +19,11 @@ public class Cache<K, V> implements ICache<K, V> {
      * map信息
      */
     private final Map<K, V> map;
+
+    /**
+     * 删除监听类
+     */
+    private List<ICacheRemoveListener<K,V>> removeListeners;
 
     /**
      * 大小限制
@@ -97,6 +101,7 @@ public class Cache<K, V> implements ICache<K, V> {
      * @return
      */
     @Override
+    @CacheInterceptor
     public ICache<K, V> expire(K key, long timeInMills) {
 
         long expireTime = System.currentTimeMillis() + timeInMills;
@@ -108,12 +113,14 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor
     public ICache<K, V> expireAt(K key, long timeInMills) {
         this.cacheExpire.expire(key, timeInMills);
         return this;
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public int size() {
         //1. 刷新所有过期信息
         this.refreshExpireAllKeys();
@@ -124,6 +131,7 @@ public class Cache<K, V> implements ICache<K, V> {
 
 
     @Override
+    @CacheInterceptor(refresh = true)
     public boolean isEmpty() {
         //1. 刷新所有过期信息
         this.refreshExpireAllKeys();
@@ -132,6 +140,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public boolean containsKey(Object key) {
         //1. 刷新所有过期信息
         this.refreshExpireAllKeys();
@@ -140,11 +149,13 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public boolean containsValue(Object value) {
         return map.containsValue(value);
     }
 
     @Override
+    @CacheInterceptor
     public V get(Object key) {
         //刷新所有过期信息
         K genericKey = (K) key;
@@ -154,11 +165,19 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor
     public V put(K key, V value) {
         //检查是否需要淘汰数据
         CacheEvictContext<K, V> context = new CacheEvictContext<>();
         context.key(key).size(sizeLimit).cache(this);
-        cacheEvict.evict(context);
+        boolean evictResult = cacheEvict.evict(context);
+        if(evictResult) {
+            // 执行淘汰监听器
+            ICacheRemoveListenerContext<K,V> removeListenerContext = CacheRemoveListenerContext.<K,V>newInstance().key(key).value(value).type(CacheRemoveType.EVICT.code());
+            for(ICacheRemoveListener<K,V> listener : this.removeListeners) {
+                listener.listen(removeListenerContext);
+            }
+        }
 
         //判断淘汰后信息
         if(isSizeLimit()){
@@ -176,18 +195,20 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor
     public V remove(Object key) {
-        //输出日志
-        log.debug("key为"+key.toString()+" value 为"+this.get(key)+" 的缓存被删除");
+
         return map.remove(key);
     }
 
     @Override
+    @CacheInterceptor
     public void putAll(Map<? extends K, ? extends V> m) {
         map.putAll(m);
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public void clear() {
         //输出日志
         log.debug("缓存被清空");
@@ -195,6 +216,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public Set<K> keySet() {
         //1. 刷新所有过期信息
         this.refreshExpireAllKeys();
@@ -203,6 +225,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public Collection<V> values() {
         //1. 刷新所有过期信息
         this.refreshExpireAllKeys();
@@ -211,6 +234,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
+    @CacheInterceptor(refresh = true)
     public Set<Entry<K, V>> entrySet() {
         //1. 刷新所有过期信息
         this.refreshExpireAllKeys();
@@ -220,5 +244,19 @@ public class Cache<K, V> implements ICache<K, V> {
 
     private void refreshExpireAllKeys() {
         this.cacheExpire.refreshExpire(map.keySet());
+    }
+
+    /**
+     * 删除监听器
+     * @return
+     */
+    @Override
+    public List<ICacheRemoveListener<K, V>> removeListeners() {
+        return removeListeners;
+    }
+
+    public Cache<K, V> removeListeners(List<ICacheRemoveListener<K, V>> removeListeners) {
+        this.removeListeners = removeListeners;
+        return this;
     }
 }

@@ -1,5 +1,6 @@
 package com.tc.api;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ICache<K, V> extends Map<K, V> {
@@ -33,4 +34,6 @@ public interface ICache<K, V> extends Map<K, V> {
      * @return
      */
     ICache<K, V> load(ICacheLoad<K, V> cacheLoad);
+
+    List<ICacheRemoveListener<K, V>> removeListeners();
 }
