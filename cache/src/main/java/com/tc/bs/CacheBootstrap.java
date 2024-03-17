@@ -2,17 +2,16 @@ package com.tc.bs;
 
 
 import com.github.houbb.heaven.util.common.ArgUtil;
-import com.tc.api.ICache;
-import com.tc.api.ICacheEvict;
-import com.tc.api.ICacheLoad;
-import com.tc.api.ICachePersist;
+import com.tc.api.*;
 import com.tc.core.Cache;
 import com.tc.core.CacheContext;
 import com.tc.support.evict.CacheEvicts;
+import com.tc.support.listener.CacheRemoveListeners;
 import com.tc.support.load.CacheLoads;
 import com.tc.support.persist.CachePersists;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CacheBootstrap<K, V> {
@@ -103,6 +102,7 @@ public class CacheBootstrap<K, V> {
         context.size(size);
         Cache<K, V> cache = new Cache<>(context);
         cache.load(cacheLoad);
+        cache.removeListeners(removeListeners);
         cache.persist(cachePersist);
         cache.init();
         return cache;
@@ -115,6 +115,25 @@ public class CacheBootstrap<K, V> {
      */
     public CacheBootstrap<K, V> load(ICacheLoad<K, V> cacheLoad){
         this.cacheLoad = cacheLoad;
+        return this;
+    }
+
+    /**
+     * 删除监听类
+     * @since 0.0.6
+     */
+    private List<ICacheRemoveListener<K,V>> removeListeners = CacheRemoveListeners.defaults();
+
+    /**
+     * 添加删除监听器
+     * @param listener 监听器
+     * @return this
+     * @since 0.0.6
+     */
+    public CacheBootstrap<K, V> addRemoveListener(ICacheRemoveListener<K,V> listener) {
+        ArgUtil.notNull(listener, "listener");
+
+        this.removeListeners.add(listener);
         return this;
     }
 }

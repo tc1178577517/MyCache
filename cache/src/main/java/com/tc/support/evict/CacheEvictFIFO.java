@@ -17,17 +17,20 @@ public class CacheEvictFIFO<K, V> implements ICacheEvict<K, V> {
 
     @Override
     public boolean evict(ICacheEvictContext<K, V> context) {
-        final ICache<K, V> cache = context.cache();
-        //如果查出限制，淘汰数据
-        if(cache.size() >= context.size()){
+        boolean result = false;
+        final ICache<K,V> cache = context.cache();
+        // 超过限制，执行移除
+        if(cache.size() >= context.size()) {
             K evictKey = queue.remove();
-            //移除队头
+            // 移除最开始的元素
             cache.remove(evictKey);
+            result = true;
         }
 
-        //将新加入的元素放入队尾
+        // 将新加的元素放入队尾
         final K key = context.key();
         queue.add(key);
-        return false;
+
+        return result;
     }
 }

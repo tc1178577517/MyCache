@@ -184,7 +184,8 @@ public class Cache<K, V> implements ICache<K, V> {
             throw new CacheRuntimeException("当前队列已满，数据添加失败！");
         }
         //输出日志
-        log.debug("添加缓存—— key 为"+key.toString()+" value 为"+value.toString());
+        System.out.println("添加缓存—— key 为"+key.toString()+" value 为"+value.toString());
+//        log.debug("添加缓存—— key 为"+key.toString()+" value 为"+value.toString());
         //执行添加
         return map.put(key, value);
     }

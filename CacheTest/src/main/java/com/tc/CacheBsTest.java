@@ -1,7 +1,9 @@
 package com.tc;
 
+import com.tc.api.ICache;
 import com.tc.bs.CacheBootstrap;
 import com.tc.core.Cache;
+import com.tc.listener.MyRemoveListener;
 import com.tc.load.MyCacheLoad;
 import com.tc.support.persist.CachePersists;
 import org.junit.Assert;
@@ -65,15 +67,30 @@ public class CacheBsTest {
         TimeUnit.SECONDS.sleep(5);
     }
 
+//    @Test
+//    public void LogTest(){
+//        Cache<String, String> cache = (Cache<String, String>) CacheBootstrap.<String,String>newInstance()
+//                .size(2)
+//                .addRemoveListener(new MyRemoveListener<String, String>())
+//                .load(new MyCacheLoad())
+//                .build();
+//
+//        cache.put("removeLog1","test");
+//        cache.put("removeLog2","test");
+////        cache.clear();
+//    }
+
+    /**
+     * 删除监听器测试
+     */
     @Test
-    public void LogTest(){
-        Cache<String, String> cache = (Cache<String, String>) CacheBootstrap.<String,String>newInstance()
-                .size(3)
-                .load(new MyCacheLoad())
+    public void cacheRemoveListenerTest() {
+        ICache<String, String> cache = CacheBootstrap.<String,String>newInstance()
+                .size(1)
+                .addRemoveListener(new MyRemoveListener<String, String>())
                 .build();
 
-        cache.put("removeLog1","test");
-        cache.put("removeLog2","test");
-        cache.clear();
+        cache.put("1", "1");
+        cache.put("2", "2");
     }
 }

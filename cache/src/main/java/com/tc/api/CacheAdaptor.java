@@ -3,6 +3,7 @@ package com.tc.api;
 import com.tc.api.ICache;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,11 @@ public class CacheAdaptor<K, V> implements ICache<K, V> {
 
     @Override
     public ICache<K, V> load(ICacheLoad<K, V> cacheLoad) {
+        return null;
+    }
+
+    @Override
+    public List<ICacheRemoveListener<K, V>> removeListeners() {
         return null;
     }
 
