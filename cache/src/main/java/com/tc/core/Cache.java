@@ -26,6 +26,12 @@ public class Cache<K, V> implements ICache<K, V> {
     private List<ICacheRemoveListener<K,V>> removeListeners;
 
     /**
+     * 慢日志监听类
+     * @since 0.0.9
+     */
+    private List<ICacheSlowListener> slowListeners;
+
+    /**
      * 大小限制
      */
     private final int sizeLimit;
@@ -59,25 +65,28 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     /**
-     * 从磁盘加载缓存
-     * @return
+     * 设置持久化策略
+     * @param persist
      */
-    public ICache<K, V> load(){
-        return this;
+    public void persist(ICachePersist<K, V> persist) {
+        cachePersist = persist;
+    }
+
+
+//    public ICache<K, V> persist(ICachePersist<K, V> cachePersist){
+//        this.cachePersist = cachePersist;
+//        return this;
+//    }
+
+
+    @Override
+    public ICachePersist<K, V> persist() {
+        return cachePersist;
     }
 
     public ICache<K, V> load(ICacheLoad cacheLoad){
         this.load = cacheLoad;
         return this;
-    }
-
-    public ICache<K, V> persist(ICachePersist<K, V> cachePersist){
-        this.cachePersist = cachePersist;
-        return this;
-    }
-
-    public void setCachePersist(ICachePersist<K, V> cachePersist){
-        this.cachePersist = cachePersist;
     }
 
     /**
@@ -113,7 +122,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
-    @CacheInterceptor
+    @CacheInterceptor(aof = true)
     public ICache<K, V> expireAt(K key, long timeInMills) {
         this.cacheExpire.expire(key, timeInMills);
         return this;
@@ -165,7 +174,7 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
-    @CacheInterceptor
+    @CacheInterceptor(aof = true)
     public V put(K key, V value) {
         //检查是否需要淘汰数据
         CacheEvictContext<K, V> context = new CacheEvictContext<>();
@@ -196,20 +205,20 @@ public class Cache<K, V> implements ICache<K, V> {
     }
 
     @Override
-    @CacheInterceptor
+    @CacheInterceptor(aof = true)
     public V remove(Object key) {
 
         return map.remove(key);
     }
 
     @Override
-    @CacheInterceptor
+    @CacheInterceptor(aof = true)
     public void putAll(Map<? extends K, ? extends V> m) {
         map.putAll(m);
     }
 
     @Override
-    @CacheInterceptor(refresh = true)
+    @CacheInterceptor(refresh = true, aof = true)
     public void clear() {
         //输出日志
         log.debug("缓存被清空");
@@ -258,6 +267,16 @@ public class Cache<K, V> implements ICache<K, V> {
 
     public Cache<K, V> removeListeners(List<ICacheRemoveListener<K, V>> removeListeners) {
         this.removeListeners = removeListeners;
+        return this;
+    }
+
+    @Override
+    public List<ICacheSlowListener> slowListeners() {
+        return slowListeners;
+    }
+
+    public Cache<K, V> slowListeners(List<ICacheSlowListener> slowListeners) {
+        this.slowListeners = slowListeners;
         return this;
     }
 }

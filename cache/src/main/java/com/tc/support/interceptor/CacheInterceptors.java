@@ -1,6 +1,7 @@
 package com.tc.support.interceptor;
 
 import com.tc.api.ICacheInterceptor;
+import com.tc.support.interceptor.aof.CacheInterceptorAof;
 import com.tc.support.interceptor.common.CacheInterceptorCost;
 import com.tc.support.interceptor.refresh.CacheInterceptorRefresh;
 
@@ -37,4 +38,13 @@ public final class CacheInterceptors {
         return list;
     }
 
+    /**
+     * AOF 模式
+     * @return 结果
+     * @since 0.0.10
+     */
+    @SuppressWarnings("all")
+    public static ICacheInterceptor aof() {
+        return new CacheInterceptorAof();
+    }
 }

@@ -1,16 +1,22 @@
 package com.tc.support.proxy.bs;
 
+import com.tc.annotation.CacheInterceptor;
 import com.tc.api.ICache;
 
 import java.lang.reflect.Method;
 
+/**
+ * @author binbin.hou
+ * @since 0.0.4
+ */
 public interface ICacheProxyBsContext {
-//    /**
-//     * 拦截器信息
-//     * @return 拦截器
-//     * @since 0.0.5
-//     */
-//    CacheInterceptor interceptor();
+
+    /**
+     * 拦截器信息
+     * @return 拦截器
+     * @since 0.0.5
+     */
+    CacheInterceptor interceptor();
 
     /**
      * 获取代理对象信息
@@ -48,4 +54,5 @@ public interface ICacheProxyBsContext {
      * @throws Throwable 异常信息
      */
     Object process() throws Throwable;
+
 }

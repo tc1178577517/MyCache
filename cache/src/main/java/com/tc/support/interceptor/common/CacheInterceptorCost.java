@@ -1,9 +1,14 @@
 package com.tc.support.interceptor.common;
 
+import com.github.houbb.heaven.util.util.CollectionUtil;
 import com.github.houbb.log.integration.core.Log;
 import com.github.houbb.log.integration.core.LogFactory;
 import com.tc.api.ICacheInterceptor;
 import com.tc.api.ICacheInterceptorContext;
+import com.tc.api.ICacheSlowListener;
+import com.tc.support.listener.slow.CacheSlowListenerContext;
+
+import java.util.List;
 
 
 /**
@@ -27,8 +32,29 @@ public class CacheInterceptorCost<K,V> implements ICacheInterceptor<K,V> {
 
     @Override
     public void after(ICacheInterceptorContext<K,V> context) {
-        long cost = context.endMills()-context.startMills();
-        log.debug("Cost end, method: {}, cost: {}ms", context.method().getName(), cost);
+        long costMills = context.endMills()-context.startMills();
+        final String methodName = context.method().getName();
+        log.debug("Cost end, method: {}, cost: {}ms", methodName, costMills);
+
+        // 添加慢日志操作
+        List<ICacheSlowListener> slowListeners = context.cache().slowListeners();
+        if(CollectionUtil.isNotEmpty(slowListeners)) {
+            CacheSlowListenerContext listenerContext = CacheSlowListenerContext.newInstance().startTimeMills(context.startMills())
+                    .endTimeMills(context.endMills())
+                    .costTimeMills(costMills)
+                    .methodName(methodName)
+                    .params(context.params())
+                    .result(context.result())
+                    ;
+
+            // 设置多个，可以考虑不同的慢日志级别，做不同的处理
+            for(ICacheSlowListener slowListener : slowListeners) {
+                long slowThanMills = slowListener.slowerThanMills();
+                if(costMills >= slowThanMills) {
+                    slowListener.listen(listenerContext);
+                }
+            }
+        }
     }
 
 }

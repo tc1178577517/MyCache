@@ -5,6 +5,7 @@ import com.tc.bs.CacheBootstrap;
 import com.tc.core.Cache;
 import com.tc.listener.MyRemoveListener;
 import com.tc.load.MyCacheLoad;
+import com.tc.support.load.CacheLoads;
 import com.tc.support.persist.CachePersists;
 import org.junit.Assert;
 import org.junit.Test;
@@ -92,5 +93,36 @@ public class CacheBsTest {
 
         cache.put("1", "1");
         cache.put("2", "2");
+    }
+
+    /**
+     * 持久化 AOF 接口测试
+     * @since 0.0.10
+     */
+    @Test
+    public void persistAofTest() throws InterruptedException {
+        ICache<String, String> cache = CacheBootstrap.<String,String>newInstance()
+                .persist(CachePersists.<String, String>aof("C:\\Users\\volcano\\Desktop\\1.aof"))
+                .build();
+
+        cache.put("1", "1");
+        cache.expire("1", 10);
+        cache.remove("2");
+
+        TimeUnit.SECONDS.sleep(1);
+    }
+
+    /**
+     * 加载 AOF 接口测试
+     * @since 0.0.10
+     */
+    @Test
+    public void loadAofTest() throws InterruptedException {
+        ICache<String, String> cache = CacheBootstrap.<String,String>newInstance()
+                .load(CacheLoads.<String, String>aof("default.aof"))
+                .build();
+
+        Assert.assertEquals(1, cache.size());
+        System.out.println(cache.keySet());
     }
 }

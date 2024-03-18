@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 通过Json方式持久化
@@ -51,5 +52,20 @@ public class CachePersistDbJson<K , V> implements ICachePersist<K , V> {
 
         }
 
+    }
+
+    @Override
+    public long delay() {
+        return 0;
+    }
+
+    @Override
+    public long period() {
+        return 0;
+    }
+
+    @Override
+    public TimeUnit timeUnit() {
+        return null;
     }
 }

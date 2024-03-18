@@ -1,10 +1,16 @@
 package com.tc.support.proxy.bs;
 
+import com.tc.annotation.CacheInterceptor;
 import com.tc.api.ICache;
 
 import java.lang.reflect.Method;
 
-public class CacheProxyBsContext implements ICacheProxyBsContext{
+/**
+ * 代理引导类上下文
+ * @since 0.0.4
+ */
+public class CacheProxyBsContext implements ICacheProxyBsContext {
+
     /**
      * 目标
      * @since 0.0.4
@@ -23,11 +29,11 @@ public class CacheProxyBsContext implements ICacheProxyBsContext{
      */
     private Method method;
 
-//    /**
-//     * 拦截器
-//     * @since 0.0.5
-//     */
-//    private CacheInterceptor interceptor;
+    /**
+     * 拦截器
+     * @since 0.0.5
+     */
+    private CacheInterceptor interceptor;
 
     /**
      * 新建对象
@@ -71,12 +77,12 @@ public class CacheProxyBsContext implements ICacheProxyBsContext{
 
     public CacheProxyBsContext method(Method method) {
         this.method = method;
-//        this.interceptor = method.getAnnotation(CacheInterceptor.class);
+        this.interceptor = method.getAnnotation(CacheInterceptor.class);
         return this;
     }
 
-//    @Override
-//    public CacheInterceptor interceptor() {
-//        return interceptor;
-//    }
+    @Override
+    public CacheInterceptor interceptor() {
+        return interceptor;
+    }
 }

@@ -4,7 +4,6 @@ import com.tc.api.ICachePersist;
 
 /**
  * 缓存持久化工具类
- * @author binbin.hou
  * @since 0.0.8
  */
 public final class CachePersists {
@@ -25,7 +24,7 @@ public final class CachePersists {
     }
 
     /**
-     * 无操作
+     * json全盘缓存
      *
      * @param <K>  key
      * @param <V>  value
@@ -35,5 +34,17 @@ public final class CachePersists {
      */
     public static <K, V> ICachePersist<K, V> dbJson(final String path) {
         return new CachePersistDbJson<>(path);
+    }
+
+    /**
+     * AOF 持久化
+     * @param <K> key
+     * @param <V> value
+     * @param path 文件路径
+     * @return 结果
+     * @since 0.0.10
+     */
+    public static <K,V> ICachePersist<K,V> aof(final String path) {
+        return new CachePersistAof<>(path);
     }
 }

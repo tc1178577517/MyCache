@@ -36,4 +36,18 @@ public interface ICache<K, V> extends Map<K, V> {
     ICache<K, V> load(ICacheLoad<K, V> cacheLoad);
 
     List<ICacheRemoveListener<K, V>> removeListeners();
+
+    /**
+     * 持久化类
+     * @return 持久化类
+     * @since 0.0.10s
+     */
+    ICachePersist<K,V> persist();
+
+    /**
+     * 慢日志监听类列表
+     * @return 监听器列表
+     * @since 0.0.9
+     */
+    List<ICacheSlowListener> slowListeners();
 }
